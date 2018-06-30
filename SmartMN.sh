@@ -197,7 +197,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     echo
     echo -e "${CYAN}masternode1 ${mnip}:${COINPORT} ${mnkey} tx index${NONE}"
     echo
-    echo -e "${BOLD}Thank you for your support of Salen Coin.${NONE}"
+    echo -e "${BOLD}Thank you for your support of The Stim Community.${NONE}"
     echo
 else
     echo && echo "Installation cancelled" && echo
