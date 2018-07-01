@@ -9,17 +9,18 @@ CYAN='\033[01;36m'
 WHITE='\033[01;37m'
 BOLD='\033[1m'
 UNDERLINE='\033[4m'
-MAX=10
+MAX=11
 
 COINGITHUB=https://github.com/Stim-Community/stim.git
-
+COINPATH=usr/local/bin
 COINSRCDIR=Stim
 # P2Pport and RPCport can be found in chainparams.cpp -> CMainParams()
 COINPORT=8093
 COINRPCPORT=8091
 COINDAEMON=stimd
+COINCLI=stim-cli
 # COINCORE can be found in util.cpp -> GetDefaultDataDir()
-COINCORE=.stimcore
+COINCORE=root/.stimcore
 COINCONFIG=stim.conf
 key=""
 
@@ -157,10 +158,55 @@ configureWallet() {
     echo -e "${NONE}${GREEN}* Completed${NONE}";
 }
 
+configure_systemd() {
+    echo
+    echo -e "[10/${MAX}] Configuring systemd..."
+    cat << EOF > /etc/systemd/system/$COINSRCDIR.service
+    [Unit]
+    Description=$COINSRCDIR service
+    After=network.target
+
+    [Service]
+    User=root
+    Group=root
+
+    Type=forking
+    #PIDFile=$COINCORE/$COINSRCDIR.pid
+
+    ExecStart=$COINPATH$COINDAEMON -daemon -conf=$COINCORE/$COINCONFIG -datadir=$COINCORE
+    ExecStop=-$COINPATH$COINCLI -conf=$COINCORE/$COINCONFIG -datadir=$COINCONFIG stop
+
+    Restart=always
+    PrivateTmp=true
+    TimeoutStopSec=60s
+    TimeoutStartSec=10s
+    StartLimitInterval=120s
+    StartLimitBurst=5
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+
+      systemctl daemon-reload
+      sleep 3
+      systemctl start $COINSRCDIR.service
+      systemctl enable $COINSRCDIR.service >/dev/null 2>&1
+
+      if [[ -z "$(ps axo cmd:100 | egrep $COINDAEMON)" ]]; then
+         echo -e "${RED}$COINSRCDIR is not running${NC}, please investigate. You should start by running the following commands as root:"
+         echo -e "${GREEN}systemctl start $COINSRCDIR.service"
+         echo -e "systemctl status $COINSRCDIR.service"
+         echo -e "less /var/log/syslog${NC}"
+         exit 1
+       fi
+    echo -e "${NONE}${GREEN}* Completed${NONE}";
+}
+
+
 
 startWallet() {
     echo
-    echo -e "[10/${MAX}] Starting wallet daemon..."
+    echo -e "[11/${MAX}] Starting wallet daemon..."
     cd /root/$COINSRCDIR/src
     sudo ./$COINDAEMON -daemon > /dev/null 2>&1
     sleep 5
