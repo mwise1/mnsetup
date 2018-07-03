@@ -150,7 +150,7 @@ configureWallet() {
     echo -e "${NONE}${GREEN}* Completed${NONE}";
 }
 
-configure_systemd() {
+configuresystemd() {
     echo
     echo -e "[9/${MAX}] Configuring systemd..."
     cat `EOF > /etc/systemd/system/$COINSRCDIR.service`
@@ -221,7 +221,6 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
         echo && exit
     fi
     checkForUbuntuVersion
-    updateAndUpgrade
     setupSwap
     installFail2Ban
     installFirewall
@@ -229,6 +228,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
     compileWallet
     installWallet
     configureWallet
+    configuresystemd
     startWallet
     echo
     echo -e "${BOLD}The VPS side of your masternode has been installed. Use the following line in your cold wallet masternode.conf and replace the tx and index${NONE}".
