@@ -35,25 +35,17 @@ checkForUbuntuVersion() {
     fi
 }
 
-updateAndUpgrade() {
-    echo
-    echo "[2/${MAX}] Runing update and upgrade. Please wait..."
-    sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq -y > /dev/null 2>&1
-    sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -qq > /dev/null 2>&1
-    echo -e "${GREEN}* Completed${NONE}";
-}
-
 setupSwap() {
     echo -e "${BOLD}"
     read -e -p "Add swap space? (If you use a 1G RAM VPS, choose Y.) [Y/n] :" add_swap
     if [[ ("$add_swap" == "y" || "$add_swap" == "Y" || "$add_swap" == "") ]]; then
         swap_size="3G"
     else
-        echo -e "${NONE}[3/${MAX}] Swap space not created."
+        echo -e "${NONE}[2/${MAX}] Swap space not created."
     fi
 
     if [[ ("$add_swap" == "y" || "$add_swap" == "Y" || "$add_swap" == "") ]]; then
-        echo && echo -e "${NONE}[3/${MAX}] Adding swap space...${YELLOW}"
+        echo && echo -e "${NONE}[2/${MAX}] Adding swap space...${YELLOW}"
         sudo fallocate -l $swap_size /swapfile
         sleep 2
         sudo chmod 600 /swapfile
@@ -72,7 +64,7 @@ installFail2Ban() {
     echo -e "${BOLD}"
     read -e -p "Install Fail2Ban? (This is just a safety program, optional.) [Y/n] :" install_F2B
     if [[ ("$install_F2B" == "y" || "$install_F2B" == "Y" || "$install_F2B" == "") ]]; then
-        echo -e "[4/${MAX}] Installing fail2ban. Please wait..."
+        echo -e "[3/${MAX}] Installing fail2ban. Please wait..."
         sudo apt-get -y install fail2ban > /dev/null 2>&1
         sudo systemctl enable fail2ban > /dev/null 2>&1
         sudo systemctl start fail2ban > /dev/null 2>&1
@@ -86,7 +78,7 @@ installFirewall() {
     echo -e "${BOLD}"
     read -e -p "Install Firewall? (This is just for safety, optional.) [Y/n] :" install_FW
     if [[ ("$install_FW" == "y" || "$install_FW" == "Y" || "$install_FW" == "") ]]; then
-        echo -e "[5/${MAX}] Installing UFW. Please wait..."
+        echo -e "[4/${MAX}] Installing UFW. Please wait..."
         sudo apt-get -y install ufw > /dev/null 2>&1
         sudo ufw default deny incoming > /dev/null 2>&1
         sudo ufw default allow outgoing > /dev/null 2>&1
@@ -104,7 +96,7 @@ installFirewall() {
 
 installDependencies() {
     echo
-    echo -e "[6/${MAX}] Installing dependecies. Please wait..."
+    echo -e "[5/${MAX}] Installing dependecies. Please wait..."
     sudo apt-get install git nano rpl wget python-virtualenv -qq -y > /dev/null 2>&1
     sudo apt-get install build-essential libtool automake autoconf -qq -y > /dev/null 2>&1
     sudo apt-get install autotools-dev autoconf pkg-config libssl-dev -qq -y > /dev/null 2>&1
@@ -120,7 +112,7 @@ installDependencies() {
 
 compileWallet() {
     echo
-    echo -e "[7/${MAX}] Compiling wallet. Please wait..."
+    echo -e "[6/${MAX}] Compiling wallet. Please wait..."
     git clone $COINGITHUB $COINSRCDIR > /dev/null 2>&1
     cd $COINSRCDIR > /dev/null 2>&1
     chmod 755 autogen.sh > /dev/null 2>&1
@@ -134,7 +126,7 @@ compileWallet() {
 
 installWallet() {
     echo
-    echo -e "[8/${MAX}] Installing wallet. Please wait..."
+    echo -e "[7/${MAX}] Installing wallet. Please wait..."
     cd /root/$COINSRCDIR/src
     strip $COINDAEMON
     echo -e "${NONE}${GREEN}* Completed${NONE}";
@@ -142,7 +134,7 @@ installWallet() {
 
 configureWallet() {
     echo
-    echo -e "[9/${MAX}] Configuring wallet. Please wait..."
+    echo -e "[8/${MAX}] Configuring wallet. Please wait..."
     sudo mkdir -p /root/$COINCORE
     sudo touch /root/$COINCORE/$COINCONFIG
     sleep 10
@@ -160,7 +152,7 @@ configureWallet() {
 
 configure_systemd() {
     echo
-    echo -e "[10/${MAX}] Configuring systemd..."
+    echo -e "[9/${MAX}] Configuring systemd..."
     cat << EOF > /etc/systemd/system/$COINSRCDIR.service
     [Unit]
     Description=$COINSRCDIR service
@@ -206,7 +198,7 @@ configure_systemd() {
 
 startWallet() {
     echo
-    echo -e "[11/${MAX}] Starting wallet daemon..."
+    echo -e "[10/${MAX}] Starting wallet daemon..."
     cd /root/$COINSRCDIR/src
     sudo ./$COINDAEMON -daemon > /dev/null 2>&1
     sleep 5
