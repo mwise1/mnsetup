@@ -166,7 +166,7 @@ configure_systemd() {
     #PIDFile=$COINCORE/$COINSRCDIR.pid
 
     ExecStart=$COINPATH$COINDAEMON -daemon -conf=$COINCORE/$COINCONFIG -datadir=$COINCORE
-    ExecStop=-$COINPATH$COINCLI -conf=$COINCORE/$COINCONFIG -datadir=$COINCONFIG stop
+    ExecStop=-$COINPATH$COINCLI -conf=$COINCORE/$COINCONFIG -datadir=$COINCORE stop
 
     Restart=always
     PrivateTmp=true
