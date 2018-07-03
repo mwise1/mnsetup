@@ -161,7 +161,7 @@ configureWallet() {
 configure_systemd() {
     echo
     echo -e "[10/${MAX}] Configuring systemd..."
-    cat << EOF > /etc/systemd/system/$COINSRCDIR.service
+    cat `EOF > /etc/systemd/system/$COINSRCDIR.service`
     [Unit]
     Description=$COINSRCDIR service
     After=network.target
